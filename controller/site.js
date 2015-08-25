@@ -22,36 +22,9 @@ exports.socket = function(server){
 	var site = io.of('/socket/site');
 	//连接对象
 	site.on('connection', function (socket) {		
-		socket.on('exec', function(date){
-			var sites = config.sites;
-			var  servers = config.servers;
-			var cmd = '';
-			var args = [];
-			var cwd = '';
-			switch(date.cmd){
-				case 'pull':
-					cmd = 'git';
-					args = ['pull'];
-					cwd =  servers[date.server].wwwPath + sites[date.site].path;
-					break;
-				case 'restart':
-					cmd = sites[date.site].restart.cmd;
-					args = sites[date.site].restart.args;
-					cwd =  servers[date.server].wwwPath + sites[date.site].path;
-					break;
-				case 'npm':
-					cmd = 'npm';
-					args = ['install'];
-					cwd =  servers[date.server].wwwPath + sites[date.site].path;
-					break;
-				case 'log':
-					cmd = 'tail';
-					args = ['-f', servers[date.server].logPath + sites[date.site].logfile];
-					cwd =  '/';
-					break;
-			}
-
-			var child = child_process.spawn(cmd, args, {cwd:cwd});
+		socket.on('exec', function(data){
+			var arg = _makeCmd(data);
+			var child = child_process.spawn(arg.cmd, arg.args, {cwd:arg.cwd});
 	    	//打印子进程的输出数据
 			child.stdout.on('data', function (data) {
 				// console.log(data);
@@ -76,4 +49,41 @@ exports.socket = function(server){
 	    	
 		});
 	});
+}
+
+//构建命令
+function _makeCmd(data){
+	var sites = config.sites;
+	var  servers = config.servers;
+	var cmd = '';
+	var args = [];
+	var cwd = '';
+	switch(data.cmd){
+		case 'pull':
+			cmd = 'git';
+			args = ['pull'];
+			cwd =  servers[data.server].wwwPath + sites[data.site].path;
+			break;
+		case 'restart':
+			cmd = sites[data.site].restart.cmd;
+			args = sites[data.site].restart.args;
+			cwd =  servers[data.server].wwwPath + sites[data.site].path;
+			break;
+		case 'npm':
+			cmd = 'npm';
+			args = ['install'];
+			cwd =  servers[data.server].wwwPath + sites[data.site].path;
+			break;
+		case 'log':
+			cmd = 'tail';
+			args = ['-f', servers[data.server].logPath + sites[data.site].logfile];
+			cwd =  '/';
+			break;
+	}
+
+	return {
+		cmd: cmd,
+		args: args,
+		cwd: cwd
+	}
 }
