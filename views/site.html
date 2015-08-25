@@ -1,0 +1,89 @@
+<div class="wrapper">
+
+    <!-- HEAD NAV -->
+    <% include ./shared/navbar.html %>
+    <!-- END: HEAD NAV -->
+
+    <!-- BODY -->
+    <div class="body">
+        <!-- SIDEBAR -->
+        <% include ./shared/sidebar.html %>
+        <!-- END: SIDEBAR -->
+    <section class="content">      
+        <ol class="breadcrumb">
+            <li>站点管理</li>
+            <li class="active"><%= sites[key].name %></li>
+        </ol>
+<!-- CONTENT -->
+<div class="main-content">
+    <% include ./shared/alert.html %>
+    <div class="row">
+        <div class="col-md-12">
+        <form>
+            <div class="row">
+                <h4 class="col-md-2"><%= sites[key].name %></h4>
+                <div class="col-md-6">
+                    <p>服务器节点：<% if(Array.isArray(sites[key].host)) {%><% for(var i=0;i<sites[key].host.length ;i++) {%>
+                    <% if(locals.server&&server===sites[key].host[i]) {%>
+                    <span class="label label-default"><%= sites[key].host[i] %></span>
+                    <%} else {%>
+                    <span class="label"><a href="?server=<%= sites[key].host[i] %>"><%= sites[key].host[i] %></a></span>
+                    <% } %>
+                    <%}} else {%>
+                    <span class="label label-default"><%= sites[key].host %></span>
+                    <%}%>
+                </div>
+                <div class="col-md-4">
+                    <p class="header-info">
+                        <button type="button" class="btn btn-primary" name="pull"><i class="fa fa-download"> git pull </i></button>
+                        <% if(sites[key].type==='node') {%>
+                        <button type="button" class="btn btn-primary" name="restart"><i class="fa fa-repeat"> restart </i></button>
+                        <button type="button" class="btn  btn-primary" name="npm"><i class="fa fa-road"> npm install </i></button>
+                        <% } %>
+                    </p>
+                </div>
+            </div>
+            <hr class="no-top-margin">
+            <div class="row">
+                <div class="col-md-10 col-sm-10">
+                    <pre id="log" style="background-color:#000; color:#fff; height:550px;overflow-x:hidden;overflow-y:auto; ">
+                    </pre>
+                </div>
+            </div>
+        </form>
+    </div>
+    </div>
+<!-- END: CONTENT -->
+    </section>
+    </div>
+    <!-- END: BODY -->
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+$(function(){
+    //与指定的服务器节点建立soket连接
+    var socket = io('<%= servers[server].host %>/socket/site');
+    socket.on('connect', function () {
+        console.log('连接成功');
+        <% if( sites[key].type==='node') {%>
+        //动态站，连接后显示站点日志
+        var data = { cmd: 'log', site: '<%= key %>', server:'<%= server %>'};
+        socket.emit('exec', data);
+        <% } %>
+    });
+
+    //服务器站数据显示
+    socket.on('data', function(data){
+        var log = document.getElementById('log');
+        log.innerHTML = log.innerHTML +data;
+        log.scrollTop=Math.max(0,log.scrollHeight-log.offsetHeight);
+    });
+
+    //点击按钮后，通过socket将要执行的操作传递给服务器
+    $('button').click(function(){
+        var data = { cmd: '', site: '<%= key %>', server:'<%= server %>'};
+        data.cmd = $(this).prop('name');
+        socket.emit('exec', data);
+    })
+});
+</script>

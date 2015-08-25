@@ -1,0 +1,46 @@
+<div class="login-wrap">
+    <span class="brand">
+    site-manager
+    </span>
+    <div class="panel">
+        <div class="panel-heading">
+            <h3 class="panel-title">登录</h3>
+        </div>
+        <div class="panel-body">
+            <form action="/login" method="post" id='loginForm' onsubmit="return validateForm()" >
+                <div class="form-group">
+                    <input type="input" class="form-control" name="userName" id="userName" placeholder="登录帐号" value="<%= locals.userName||'' %>" />
+                </div>
+                <span class="help-block"></span>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="password" placeholder="密码" />
+                    <input type="hidden" name="password" value="" />
+                </div>
+                <span class="help-block"><%= locals.message||'' %></span>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <br/>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/js/md5.min.js"></script>
+<script type="text/javascript">
+$(function(){
+    $('#password').blur(function(){
+        $("input[name=password]").val(md5($("#password").val()));
+    });
+
+})
+function validateForm(){
+    var status = true;
+    if(validator.isNull($('#userName').val())){
+        validateInfo($('#userName'), '登录帐号不能为空', 'error')
+        status = false;
+    }
+    if(validator.isNull($('#password').val())){
+        validateInfo($('#password'), '密码不能为空', 'error')
+        status = false;
+    }
+    return status;
+}
+</script>

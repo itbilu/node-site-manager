@@ -1,0 +1,9 @@
+<%if(typeof alert != 'undefined'){%>
+  <div class="alert alert-dismissable alert-<%if(alert.type=='success'){%>success<%}else if(alert.type=='info'){%>info<%}else if(alert.type=='warning'){%>warning<%}else if(alert.type=='danger'){%>danger<%}else{%>info<%}%>">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <%if(alert.strong){%>
+        <strong><%=alert.strong||''%></strong>
+    <%}%>
+    <%=alert.message||''%>
+  </div>
+<%}%>

@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+var app = require('../app');
+var http = require('http');
+var site = require('../controller/').site;
+
+app.set('port', process.env.PORT || 9999);
+
+var server = http.createServer(app);
+site.socket(server);
+
+server.listen(app.get('port'), function(err) {
+	if(err){
+        throw err;
+    }else{
+        console.log("server start on "+(process.env.PORT || 9999)+"...")
+    }
+});

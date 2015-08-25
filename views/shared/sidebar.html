@@ -1,0 +1,13 @@
+    <aside class="sidebar">
+        <ul class="nav nav-stacked">
+            <li <%if(locals.menu&&locals.menu==='index') {%>class="active"<%}%>><a href="/"><i class="fa fa-dashboard fa-fw"></i>仪表盘</a></li>
+            <li class="menu <%if(locals.menu&&locals.menu==='site') {%>active<%}%>" >
+                <a href="#" class="menu-toggle"><i class="fa fa-cogs fa-cloud"></i>站点管理<i class="caret"></i></a>
+                <ul class="submenu">
+                <% for(var key in sites) {%>
+                    <li <%if(locals.key&&locals.key===key) {%>class="active"<%}%>><a href="/site/<%= key %>"><i class="fa fa-retweet"></i><span><%= sites[key].name %></span></a></li> 
+                <% } %>
+                </ul>
+            </li>
+        </ul>
+    </aside>
